@@ -1,208 +1,94 @@
 ---
-title: Ollama
-description: Installation and usage guide for easy-docs.
-github: https://github.com/DarkInventor/easy-docs
+title: Intégration Ollama
+description: Présentation de l'intégration Ollama dans la Plateforme d'Évaluation Automatisée d'Exercices de Bases de Données
 ---
 
-# Fonctionnalités d'Intelligence Artificielle
 
-Notre plateforme CodeEval IA intègre des capacités avancées d'intelligence artificielle pour révolutionner l'évaluation des travaux académiques. Voici un aperçu détaillé des fonctionnalités IA implémentées dans notre système :
+## Qu'est-ce qu'Ollama?
 
-## Évaluation de Code
+[Ollama](https://ollama.ai) est une solution open-source qui permet d'exécuter des modèles de langage large (LLMs) localement sur votre propre matériel. Cette solution offre la possibilité de déployer des modèles d'IA comme Llama 2, Mistral, ou Gemma sans dépendre de services cloud.
 
-### Analyse Syntaxique Automatisée
+<img  src="https://www.librechat.ai/images/blog/2024-03-02_ollama.png" className="w-50 rounded-lg"/>
 
-Notre système effectue une analyse syntaxique approfondie du code soumis :
 
-- **Détection d'erreurs** : Identification des erreurs de syntaxe et de compilation
-- **Vérification de style** : Évaluation de la conformité aux conventions de codage
-- **Suggestion de corrections** : Propositions d'amélioration pour les problèmes détectés
+## Caractéristiques principales d'Ollama
 
-### Analyse Sémantique Intelligente
+Ollama propose plusieurs fonctionnalités clés:
 
-Au-delà de la syntaxe, notre IA évalue la qualité sémantique du code :
+- **Exécution locale**: Les modèles s'exécutent entièrement sur votre propre matériel
+- **Confidentialité des données**: Aucune donnée n'est envoyée à des serveurs externes
+- **Personnalisation**: Possibilité d'ajuster et de fine-tuner les modèles selon vos besoins
+- **API simple**: Interface REST facile à intégrer dans des applications existantes
+- **Support multi-modèles**: Accès à une bibliothèque croissante de modèles pré-entraînés
+- **Faible empreinte**: Optimisé pour fonctionner efficacement sur du matériel standard
 
-- **Évaluation algorithmique** : Analyse de l'efficacité et de la complexité des algorithmes
-- **Détection de bugs logiques** : Identification des erreurs de logique qui ne provoquent pas d'erreurs de compilation
-- **Vérification de robustesse** : Évaluation de la gestion des cas limites et des exceptions
+[//]: # ()
+[//]: # (## Architecture d'intégration prévue)
 
-### Évaluation de la Qualité du Code
+[//]: # ()
+[//]: # (Notre plan initial d'intégration d'Ollama prévoyait l'architecture suivante:)
 
-Notre système évalue la qualité globale du code selon plusieurs critères :
+[//]: # ()
+[//]: # (![Architecture d'intégration Ollama]&#40;/images/integrations/ollama-architecture.png&#41;)
 
-- **Lisibilité** : Évaluation de la clarté et de la structure du code
-- **Maintenabilité** : Analyse de la facilité de maintenance et d'extension
-- **Performance** : Évaluation de l'efficacité et de l'optimisation
-- **Modularité** : Analyse de la structure et de la réutilisabilité des composants
+### Endpoints développés
 
-### Support Multi-langages
-
-Notre plateforme prend en charge une large gamme de langages de programmation :
-
-- **Langages web** : JavaScript, TypeScript, HTML, CSS
-- **Langages orientés objet** : Java, C#, Python, C++
-- **Langages fonctionnels** : Haskell, Scala, Clojure
-- **Langages de script** : Ruby, PHP, Bash
-- **Langages de bas niveau** : C, Assembly
-
-## Évaluation de QCM
-
-### Correction Automatique
-
-Notre système effectue une correction automatique des QCM :
-
-- **Évaluation instantanée** : Notation immédiate des réponses
-- **Calcul de score** : Attribution de points selon la complexité et l'importance des questions
-- **Détection de patterns** : Identification des tendances et des difficultés récurrentes
-
-### Analyse de Réponses
-
-Notre IA va au-delà de la simple correction binaire :
-
-- **Évaluation des réponses partielles** : Attribution de points pour les réponses partiellement correctes
-- **Analyse des erreurs communes** : Identification des erreurs fréquentes et des incompréhensions
-- **Suggestion de révisions** : Recommandations personnalisées basées sur les erreurs détectées
-
-## Évaluation de Documents
-
-### Analyse de Contenu
-
-Notre système analyse en profondeur le contenu des documents soumis :
-
-- **Évaluation de la structure** : Analyse de l'organisation et de la cohérence du document
-- **Évaluation du style** : Analyse du style d'écriture et de la clarté
-- **Vérification des sources** : Identification et validation des références
-
-### Détection de Plagiat
-
-Notre IA intègre des algorithmes avancés de détection de plagiat :
-
-- **Comparaison de contenu** : Détection de similitudes avec des sources externes
-- **Analyse interne** : Comparaison avec les travaux précédemment soumis
-- **Rapport détaillé** : Présentation claire des sections potentiellement plagiées
-
-## Modèles d'IA Utilisés
-
-### OpenRouter
-
-Notre première implémentation s'appuyait sur OpenRouter pour :
-
-- **Accès à des modèles premium** : Utilisation de modèles de pointe comme GPT-4, Claude, etc.
-- **Sélection dynamique de modèles** : Choix du modèle le plus approprié selon le type d'évaluation
-- **Intégration API unifiée** : Simplification de l'accès à différents modèles
-
-### Ollama
-
-Notre implémentation actuelle utilise Ollama pour :
-
-- **Déploiement local** : Exécution des modèles directement sur nos serveurs
-- **Personnalisation avancée** : Adaptation des modèles à nos besoins spécifiques
-- **Confidentialité renforcée** : Traitement des données sans dépendance externe
-- **Réduction des coûts** : Élimination des frais par token des API commerciales
-
-### Modèles Spécialisés
-
-Nous avons développé des modèles spécialisés pour différents types d'évaluation :
-
-- **CodeEval-Syntax** : Modèle optimisé pour l'analyse syntaxique du code
-- **CodeEval-Logic** : Modèle spécialisé dans l'évaluation de la logique algorithmique
-- **DocEval** : Modèle dédié à l'évaluation de documents textuels
-- **PlagCheck** : Modèle spécialisé dans la détection de plagiat
-
-## Génération de Feedback
-
-### Feedback Personnalisé
-
-Notre système génère des feedbacks détaillés et personnalisés :
-
-- **Commentaires spécifiques** : Remarques ciblées sur les points forts et les points à améliorer
-- **Suggestions concrètes** : Propositions d'améliorations précises et applicables
-- **Ton constructif** : Communication positive et encourageante
-
-### Adaptation au Niveau
-
-Le feedback est adapté au niveau de l'étudiant :
-
-- **Débutant** : Explications détaillées et fondamentales
-- **Intermédiaire** : Focus sur les bonnes pratiques et l'optimisation
-- **Avancé** : Suggestions d'approfondissement et de perfectionnement
-
-## Intégration IA dans le Workflow
-
-```mermaid
-graph TD
-    A[Soumission] --> B[Analyse Initiale]
-    B --> C{Type de Soumission}
-    C -->|Code| D[Analyse Syntaxique]
-    D --> E[Analyse Sémantique]
-    E --> F[Évaluation de Qualité]
-    C -->|QCM| G[Correction Automatique]
-    G --> H[Analyse des Réponses]
-    C -->|Document| I[Analyse de Contenu]
-    I --> J[Détection de Plagiat]
-    F --> K[Génération de Feedback]
-    H --> K
-    J --> K
-    K --> L[Notation]
-    L --> M[Rapport Final]
-```
-
-## Apprentissage Continu
-
-Notre système intègre des mécanismes d'apprentissage continu :
-
-- **Amélioration des modèles** : Affinage régulier basé sur les nouvelles données
-- **Adaptation aux tendances** : Mise à jour pour refléter l'évolution des pratiques
-- **Personnalisation institutionnelle** : Adaptation aux besoins spécifiques de chaque établissement
-
-## Cas d'Utilisation
-
-### Exemple : Évaluation d'un Algorithme de Tri
+Nous avons développé plusieurs endpoints pour communiquer avec Ollama:
 
 ```javascript
-// Soumission étudiant
-function bubbleSort(arr) {
-  for (let i = 0; i < arr.length; i++) {
-    for (let j = 0; j < arr.length; j++) {
-      if (arr[j] > arr[j + 1]) {
-        let temp = arr[j];
-        arr[j] = arr[j + 1];
-        arr[j + 1] = temp;
-      }
-    }
+// Exemple d'endpoint pour l'évaluation de code SQL
+app.post('/api/evaluate-sql', async (req, res) => {
+  try {
+    const { studentQuery, referenceQuery, database } = req.body;
+
+    // Envoi à l'API Ollama
+    const response = await fetch('http://localhost:11434/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: "mistral",
+        prompt: `Évalue cette requête SQL d'étudiant: ${studentQuery} par rapport à la requête de référence: ${referenceQuery} sur la base de données ${database}.`
+      })
+    });
+
+    const data = await response.json();
+    res.json({ evaluation: data.response });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-  return arr;
-}
+});
 ```
 
-**Feedback IA généré :**
+## Limitations et défis rencontrés
 
-```
-Votre implémentation du tri à bulles est fonctionnelle mais présente quelques points à améliorer :
+Malgré les avantages potentiels d'Ollama, nous avons rencontré plusieurs défis qui ont finalement conduit à l'abandon de cette solution:
 
-1. Optimisation : La boucle extérieure parcourt l'ensemble du tableau à chaque itération, alors qu'à chaque passage, le plus grand élément est déjà positionné. Vous pourriez réduire le nombre d'itérations en diminuant la longueur de la boucle intérieure de 1 à chaque passage.
+### 1. Contraintes de performance
 
-2. Efficacité : La complexité actuelle est de O(n²) dans tous les cas. Une optimisation possible serait d'ajouter un drapeau pour détecter si des échanges ont été effectués, permettant de terminer plus tôt si le tableau est déjà trié.
+L'exécution locale des modèles nécessitait des ressources matérielles importantes:
+- **GPU dédié**: Nécessaire pour des performances acceptables
+- **Latence élevée**: Temps de réponse trop long sur des machines standard
+- **Limites de parallélisation**: Difficulté à gérer plusieurs requêtes simultanées
 
-3. Limite d'index : Attention à l'accès à arr[j + 1] qui peut dépasser les limites du tableau lors de la dernière itération.
+### 2. Environnement local
 
-Suggestion d'amélioration :
-```
-```javascript
-function improvedBubbleSort(arr) {
-  let swapped;
-  for (let i = 0; i < arr.length; i++) {
-    swapped = false;
-    for (let j = 0; j < arr.length - i - 1; j++) {
-      if (arr[j] > arr[j + 1]) {
-        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]]; // Utilisation de la déstructuration
-        swapped = true;
-      }
-    }
-    if (!swapped) break; // Sort prématurément si aucun échange n'a été effectué
-  }
-  return arr;
-}
-```
+L'aspect local d'Ollama présentait des contraintes opérationnelles:
+- **Absence de VPX/VPS**: Pas d'environnement serveur dédié disponible
+- **Difficultés de déploiement**: Complexité pour déployer la solution à l'échelle
+- **Maintenance**: Nécessité de gérer les mises à jour et la disponibilité du service
 
-Notre système d'IA avancé transforme l'évaluation des travaux académiques en offrant une analyse approfondie, un feedback personnalisé et une expérience d'apprentissage enrichie. Grâce à l'intégration de modèles d'IA de pointe et à notre approche d'amélioration continue, CodeEval IA établit une nouvelle référence dans le domaine de l'évaluation automatisée.
+### 3. Consistance des résultats
+
+Nos tests ont révélé des problèmes de consistance:
+- **Variabilité des évaluations**: Résultats parfois incohérents entre les différentes exécutions
+- **Qualité d'évaluation**: Précision insuffisante pour certains types d'exercices complexes
+
+## Conclusion et transition
+
+Bien qu'Ollama représente une solution prometteuse pour l'exécution locale de modèles d'IA, les contraintes identifiées nous ont amenés à rechercher une alternative plus adaptée à nos besoins de production.
+
+Cette recherche nous a conduits vers [OpenRouter](/docs/TechnologiesIa/openrouter), une solution qui offre un accès unifié à divers modèles d'IA hébergés dans le cloud, avec des performances et une disponibilité supérieures.
+
+---
+
+**Section connexe**: [Intégration OpenRouter](/docs/TechnologiesIa/openrouter)

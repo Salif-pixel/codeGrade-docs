@@ -1,4 +1,101 @@
 ---
-title: Evaluation de qcm
-description: Diagrammes UML détaillant la structure et les interactions du système d'évaluation
+title: Évaluation de type QCM
+description: Guide détaillé du système d'évaluation de QCM sur la Plateforme d'Évaluation Automatisée d'Exercices de Bases de Données
 ---
+
+Cette section présente le fonctionnement du système d'évaluation des Questionnaires à Choix Multiples (QCM) sur notre plateforme.
+
+## Aperçu du Système de QCM
+
+Les QCM constituent une méthode d'évaluation efficace pour tester la compréhension théorique des concepts de bases de données. Notre système intègre des fonctionnalités avancées pour une évaluation détaillée au-delà du simple score numérique.
+
+<img  src="/assets/devoir-qcm.png" className="w-50 rounded-lg"/>
+
+## Types de Questions
+
+Notre plateforme prend en charge plusieurs formats de questions:
+
+### Choix Unique
+
+L'utilisateur doit sélectionner une seule réponse correcte parmi plusieurs options.
+
+
+### Choix Multiples
+
+L'utilisateur peut sélectionner plusieurs réponses correctes parmi les options proposées.
+
+
+
+## Processus d'Évaluation
+
+### 1. Interface de Réponse
+
+L'interface de QCM comprend:
+
+- **Énoncé de la question** clairement présenté
+- **Options de réponse** avec sélection intuitive
+- **Barre de progression** indiquant l'avancement dans le questionnaire
+- **Minuteur** (optionnel) pour les QCM chronométrés
+- **Boutons de navigation** pour passer aux questions suivantes/précédentes
+
+<img  src="/assets/process-qcm.png" className="w-50 rounded-lg"/>
+
+### 2. Soumission et Évaluation
+
+À la fin du questionnaire:
+
+1. Cliquez sur "Soumettre" pour évaluer vos réponses
+2. Le système procède à une évaluation automatique
+3. Un score global est immédiatement calculé
+4. Un rapport détaillé est généré avec l'analyse de chaque réponse
+
+<img  src="/assets/soumission-qcm.png" className="w-50 rounded-lg"/>
+
+
+## Rapport d'Évaluation
+
+### Résumé des Performances
+
+Le rapport commence par un résumé global:
+
+- **Score total**
+- **Nombre de réponses correctes/incorrectes**
+
+
+
+### Analyse Détaillée
+
+Pour chaque question:
+
+- **Votre réponse** vs la **réponse correcte**
+- **Explication détaillée** de la réponse correcte
+- **Points obtenus** pour cette question
+- **Niveau de difficulté** de la question
+
+<img  src="/assets/feedback-qcm.png" className="w-50 rounded-lg"/>
+
+
+
+
+## Vidéo Démonstrative
+
+
+
+### Soumission et évaluation d'un schéma conceptuel de base de données
+
+<div className={"w-full flex justify-center items-center"}>
+    <iframe
+        className={"rounded-lg"}
+        width="674"
+        height="380"
+        src="/videos/qcm.mp4"
+        frameborder="0"
+        allowfullscreen>
+    </iframe>
+</div>
+
+Cliquez sur l'image ci-dessus pour regarder la vidéo complète montrant comment soumettre et recevoir une évaluation pour un document.
+
+---
+
+**Prochaine section**: [Intégration avec Ollama](/docs/technologiesIa/ollama)

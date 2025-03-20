@@ -1,5 +1,246 @@
 ---
-title: Openrouter
-description: Installation and usage guide for easy-docs.
-github: https://github.com/DarkInventor/easy-docs
+title: Intégration OpenRouter
+description: Documentation de l'intégration d'OpenRouter dans la Plateforme d'Évaluation Automatisée d'Exercices
 ---
+
+
+Cette section présente notre intégration d'OpenRouter, le service d'IA que nous avons adopté pour alimenter les fonctionnalités d'évaluation automatisée de notre plateforme.
+
+## Aperçu d'OpenRouter
+
+OpenRouter est un service qui offre un accès unifié à de nombreux modèles d'IA via une API standardisée. Notre plateforme utilise OpenRouter pour évaluer les exercices de bases de données de manière précise et efficace.
+
+<img  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQey05eCfTUz02DQ1k0NkcpHfJ91fMIf3cdmg&s" className="w-50 rounded-lg"/>
+
+## Configuration et Implémentation
+
+### Configuration Initiale
+
+Pour intégrer OpenRouter à notre plateforme, nous avons d'abord configuré l'environnement avec les clés d'API nécessaires:
+
+```javascript
+// Configuration dans notre fichier .env
+OPENROUTER_API_KEY=votre_clé_api
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+```
+
+### Service d'Intégration Principal
+
+Voici une structure générale pour effectuer un appel API avec OpenRouter en JavaScript/TypeScript :
+
+```javascript
+import axios from 'axios';
+
+async function callOpenRouter(prompt, model = 'openai/gpt-4') {
+  try {
+    const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
+      model: model,
+      messages: [{ role: 'user', content: prompt }]
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    return response.data.choices[0].message.content;
+  } catch (error) {
+    console.error('Erreur lors de l\'appel à OpenRouter:', error);
+    throw new Error('Échec de la requête OpenRouter');
+  }
+}
+
+// Exemple d'utilisation
+(async () => {
+  const response = await callOpenRouter("Explique le concept de base des bases de données relationnelles.");
+  console.log(response);
+})();
+```
+
+### Explication :
+1. **Utilisation d'Axios** : Permet de gérer facilement les requêtes HTTP.
+2. **Gestion des erreurs** : Capture et affiche les erreurs éventuelles.
+3. **Modèle paramétrable** : Permet d'utiliser différents modèles IA.
+4. **Exemple d'utilisation** : Une auto-exécution pour tester l'appel.
+## Fonctionnalités d'Évaluation Implémentées
+
+Notre intégration avec OpenRouter alimente plusieurs types d'évaluations automatisées:
+
+### 1. Évaluation de Code
+
+```javascript
+// Exemple d'utilisation pour l'évaluation de code SQL
+async function generateAnswerForCode(question: QuestionData) {
+  console.log('Generating code answer for:', question.text);
+  try {
+    const prompt = `Fournis une explication détaillée et des tests précis avec le résultat attendu pour la question suivante: ${question.text}. Retourne ta réponse sous ce format JSON spécifique:
+    (ne pas inclure les parenthèses, les backticks \`\`\`json et les commentaires)
+    {
+      "type": "code",
+      "tests": [
+        {
+          "id": "test1",
+          "name": "Test basique",
+          "description": "Vérifie le fonctionnement de base",
+          "input": "Entrée du test",
+          "expectedOutput": "Sortie attendue"
+        },
+        {
+          "id": "test2",
+          "name": "Test avancé",
+          "description": "Vérifie le comportement avec des données complexes",
+          "input": "Entrée du test",
+          "expectedOutput": "Sortie attendue (résultat)"
+        }
+      ],
+      "explanation": "Explication détaillée de la solution"
+    }
+
+    Important:
+    - Fournis des tests exhaustifs pour valider la solution
+    - L'explication doit être claire et aider l'étudiant à comprendre la solution
+    - Le format JSON doit être respecté strictement`;
+
+    return await fetchOpenRouter(prompt);
+  } catch (error) {
+    console.error('Error generating code answer:', error);
+    return `Une erreur est survenue lors de la génération de la réponse pour: "${question.text}"`;
+  }
+}
+```
+
+### 2. Évaluation de QCM
+
+```javascript
+// Exemple d'utilisation pour l'évaluation de QCM
+async function generateAnswerForQCM(question: QuestionData) {
+  console.log('Generating QCM answer for:', question.text);
+  try {
+    const prompt = `Tu es un expert en évaluation. Analyse cette question QCM et fournis la ou les bonnes réponses.
+
+    Question: ${question.text}
+    Choix disponibles: ${question.choices.map((c, i) => `${i + 1}. ${c}`).join('\n')}
+
+    Retourne ta réponse sous ce format JSON exact:
+    (ne pas inclure les parenthèses, les backticks \`\`\`json et les commentaires)
+    {
+      "type": "single" OU "multiple",
+      "correctAnswers": [contenu(s) de(s) réponse(s) correcte(s) sans les numero(s) de choix],
+      "explanation": "Explication détaillée du choix",
+      "feedback": {
+        "correct": "Message à afficher si l'étudiant choisit la bonne réponse",
+        "incorrect": "Message à afficher si l'étudiant se trompe"
+      }
+    }
+
+    Important:
+    - Analyse attentivement chaque option
+    - Justifie clairement pourquoi certaines réponses sont correctes et d'autres incorrectes
+    - Fournis des explications pédagogiques et constructives
+    - Assure-toi que le format JSON est strictement respecté`;
+
+    return await fetchOpenRouter(prompt);
+  } catch (error) {
+    console.error('Error generating QCM answer:', error);
+    return `Une erreur est survenue lors de la génération de la réponse pour: "${question.text}"`;
+  }
+}
+
+async function fetchOpenRouter(prompt: string) {
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: "deepseek/deepseek-chat:free",
+      messages: [{ role: 'user', content: prompt }],
+      response_format: { type: "json_object" }
+    })
+  });
+
+  const result = await response.json();
+  console.log('OpenRouter response:', result);
+
+  try {
+    return typeof result.choices[0].message.content === 'string'
+      ? JSON.parse(result.choices[0].message.content)
+      : result.choices[0].message.content;
+  } catch (error) {
+    console.error('Failed to parse JSON response:', error);
+    return {
+      score: 0,
+      explanation: "Erreur lors de l'évaluation",
+      feedback: "Une erreur est survenue",
+      codeQuality: "Non évalué"
+    };
+  }
+}
+```
+
+### 3. Évaluation de Documents
+
+```javascript
+// Exemple d'utilisation pour l'évaluation de documents
+export async function generateDocumentAnswer(text: string, model: string = "mistralai/mistral-7b-instruct") {
+  try {
+    console.log('Generating document answer for text of length:', text.length);
+
+    const prompt = `En tant que correcteur, fournis une correction détaillée et complète de ce document.
+
+Document à corriger:
+${text}
+
+Fournis une correction détaillée qui explique les points clés, les concepts importants, et propose une solution complète.`;
+
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [{ role: 'user', content: prompt }],
+      })
+    });
+
+    const result = await response.json();
+    console.log('OpenRouter response received', result);
+
+    const evaluation = result.choices[0].message.content;
+
+    return { success: true, evaluation };
+  } catch (error) {
+    console.error('Error generating document answer:', error);
+    return {
+      success: false,
+      error: 'Échec de la génération de l\'évaluation du document'
+    };
+  }
+}
+
+```
+
+## Modèles Utilisés et leurs Cas d'Utilisation
+
+Nous utilisons différents modèles disponibles via OpenRouter selon les besoins spécifiques:
+
+| Modèle                          | Cas d'utilisation                                      | Avantages |
+|---------------------------------|--------------------------------------------------------|-----------|
+| **mistralai/mistral-7b-instruct** | Génération et compréhension de texte, assistance IA  | Modèle léger et rapide, performant sur les tâches courantes |
+| **DeepSeek-V3**                  | Tâches avancées de génération et d'analyse de texte  | Architecture MoE (671B paramètres, 37B activés/token), haute efficacité et précision |
+
+## Optimisations de Performance
+
+Pour garantir des performances optimales, nous avons implémenté plusieurs stratégies:
+
+
+1. **Optimisation des prompts**: Structure soigneusement conçue pour obtenir des résultats cohérents
+2. **Suivi des quotas et des coûts**: Monitoring de l'utilisation de l'API pour optimiser les coûts
+
+
+
+---
+
