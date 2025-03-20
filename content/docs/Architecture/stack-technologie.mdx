@@ -1,0 +1,124 @@
+---
+title: Stack technologie
+description: Diagrammes UML détaillant la structure et les interactions du système d'évaluation
+---
+
+import MermaidDiagram from "../../../components/MermaidDiagram";
+
+Notre plateforme d'évaluation automatisée repose sur une architecture moderne, évolutive et performante. Voici les technologies clés que nous utilisons pour offrir une expérience fluide et robuste.
+
+## Framework Front-end et Back-end
+
+### Next.js
+
+<img src="https://i.pinimg.com/736x/4a/2b/e7/4a2be73b1e2efb44355436c40bf496dd.jpg" className="w-50"/>
+
+[Next.js](https://nextjs.org/) est notre framework fullstack de choix, offrant:
+
+- **Rendu hybride**: Combinaison optimale de rendu côté serveur (SSR), statique (SSG) et client (CSR)
+- **Architecture API Routes**: Endpoints API intégrés sans serveur supplémentaire
+- **Routing avancé**: Navigation fluide et optimisée pour l'UX
+- **React Server Components**: Performances améliorées avec moins de JavaScript côté client
+- **Hot Module Replacement**: Développement rapide avec rechargement instantané
+
+Notre application exploite les dernières fonctionnalités de Next.js pour créer une interface utilisateur réactive et une expérience développeur optimale.
+
+## Base de données et ORM
+
+### PostgreSQL + Neon Tech
+<div className={"flex flex-row"}>
+    <img src="https://cdn.prod.website-files.com/6064b31ff49a2d31e0493af1/66a47686d17c50595ab25075_AD_4nXef8kg1j8Ne3QwQ5VMAVaubMxxFEPvv4gFeYFtVv3S9OQtr9DUgSicnoU2ONDCCwi0wdX7z9So0gE1lLnsvAfzDtGfXYLhsJaLdSCiQU6MEoi0Wapsol5RWbNKBB6hQnIgqtzJ2-zWKrJQMUb2IocBFxK1_.png" className="w-1/2"/>
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRc5bmg1-GXnNwBr7NITk9kVgRRh4GN8yNC7Q&s" className={"w-1/2"}/>
+</div>
+
+[PostgreSQL](https://www.postgresql.org/) est notre moteur de base de données relationnelle, hébergé sur [Neon Tech](https://neon.tech/):
+
+- **Évolutivité serverless**: Mise à l'échelle automatique des ressources
+- **Performance globale**: Points de présence distribués pour minimiser la latence
+- **Branchement de base de données**: Environnements d'isolation pour le développement et les tests
+- **Haute disponibilité**: Réplication et sauvegardes automatisées
+- **Stockage séparé du calcul**: Optimisation des coûts et des performances
+
+PostgreSQL offre la fiabilité et les fonctionnalités avancées nécessaires pour gérer les données complexes de notre plateforme d'évaluation.
+
+### Prisma ORM
+<img src="https://cdn.worldvectorlogo.com/logos/prisma-2.svg" />
+
+
+
+[Prisma](https://www.prisma.io/) est notre ORM moderne qui simplifie l'interaction avec la base de données:
+
+- **Schéma déclaratif**: Modélisation intuitive et type-safe de la base de données
+- **Migrations automatisées**: Gestion simplifiée des évolutions du schéma
+- **Client type-safe**: Autocomplétion et validation à la compilation
+- **Relations fluides**: Gestion simplifiée des relations entre entités
+- **Requêtes optimisées**: Performance améliorée des interactions avec la base de données
+
+Prisma améliore notre productivité tout en renforçant la sécurité et la maintenabilité du code.
+
+## Hébergement et Déploiement
+
+### Vercel
+
+<img src="https://images.ctfassets.net/crb83veve8xb/2YfNwMlyl1U0DLVXRgL8TB/9e8474e083f2ba01a296343d84f2282d/vercel_thumbnail.webp" />
+
+
+[Vercel](https://vercel.com/) est notre plateforme d'hébergement et de déploiement, offrant:
+
+- **Déploiements automatisés**: Intégration continue à partir des commits Git
+- **Prévisualisations par branche**: Test des fonctionnalités avant la mise en production
+- **Edge Network global**: Distribution CDN mondiale pour des performances optimales
+- **Serverless Functions**: Scaling automatique des fonctions backend
+- **Analytics intégrés**: Suivi des performances et de l'expérience utilisateur
+
+Vercel garantit des déploiements fiables, rapides et sans friction pour notre application.
+
+## Gestion des Fichiers
+
+### EdgeStore
+
+<img src="https://edgestore.dev/img/opengraph-image.png" />
+
+[EdgeStore](https://edgestore.dev/) est notre solution pour la gestion et l'upload de fichiers:
+
+- **Stockage distribué**: Fichiers disponibles rapidement partout dans le monde
+- **Upload direct**: Transfert optimisé du client vers le stockage
+- **Transformations d'images**: Redimensionnement et optimisation à la volée
+- **Sécurité avancée**: Contrôle d'accès granulaire aux ressources
+- **Intégration Next.js**: Compatibilité native avec notre stack
+
+EdgeStore nous permet de gérer efficacement les documents, images et autres ressources nécessaires à notre plateforme d'évaluation.
+
+## Architecture Globale
+<div className={"flex justify-center items-center"} style={{
+    backgroundColor: '#ffe9a3', // Couleur de fond
+    padding: '20px',            // Espace intérieur
+    borderRadius: '10px',       // Bordures arrondies
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Ombre
+}}>
+    <MermaidDiagram chart={`
+graph TD
+    Client[Client Browser] --> Vercel[Vercel Edge Network]
+    Vercel --> NextJS[Next.js App]
+    NextJS --> PrismaORM[Prisma ORM]
+    PrismaORM --> NeonDB[(Neon PostgreSQL)]
+    NextJS --> EdgeStore[(EdgeStore File Storage)]
+
+        style Client fill:#f9f9f8,stroke:#333,stroke-width:1px
+        style Vercel fill:#ffffff,stroke:#333,stroke-width:1px,color:#000000
+        style NextJS fill:#0070f3,stroke:#333,stroke-width:1px,color:#fff
+        style PrismaORM fill:#5a67d8,stroke:#333,stroke-width:1px,color:#fff
+        style NeonDB fill:#38b2ac,stroke:#333,stroke-width:1px,color:#fff
+        style EdgeStore fill:#ed8936,stroke:#333,stroke-width:1px,color:#fff
+`} />
+</div>
+## Avantages de notre Stack
+
+- **Performance**: Architecture optimisée pour des temps de réponse rapides
+- **Évolutivité**: Solutions serverless s'adaptant automatiquement à la charge
+- **Fiabilité**: Technologies éprouvées avec haute disponibilité
+- **Sécurité**: Protections intégrées à tous les niveaux
+- **Productivité**: Outils modernes accélérant le développement
+- **Maintenabilité**: Code type-safe et architecture modulaire
+
+Cette stack technologique nous permet de proposer une plateforme d'évaluation automatisée performante, fiable et évolutive pour les exercices de bases de données et autres types d'évaluations.

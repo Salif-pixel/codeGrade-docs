@@ -1,0 +1,235 @@
+---
+title: Architecture UML
+description: Diagrammes UML détaillant la structure et les interactions du système d'évaluation
+theme:
+color: emerald
+---
+
+import MermaidDiagram from '../../../components/MermaidDiagram';
+
+
+
+
+Notre application CodeGrade a été conçue selon une méthodologie rigoureuse basée sur UML (Unified Modeling Language). Cette approche nous a permis de modéliser efficacement les différents aspects du système, facilitant ainsi sa conception, son développement et sa maintenance.
+
+
+L'organigramme montre l'architecture physique du système et la distribution des composants.
+
+<div style={{
+    backgroundColor: '#ffe9a3',
+    padding: '20px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+}}>
+    <MermaidDiagram chart={`
+    graph TD
+        A[Début] --> B[Réception de la soumission]
+        B --> C{Type de devoir?}
+        C -->|Code| D[Analyse syntaxique]
+        C -->|QCM| E[Vérification des réponses]
+        C -->|Document| F[Analyse du document]
+        D --> G[Analyse sémantique]
+        G --> H[Évaluation de la complexité]
+        E --> I[Calcul du score]
+        F --> J[Analyse du contenu]
+        J --> K[Vérification du plagiat]
+        H --> L[Génération du feedback]
+        I --> L
+        K --> L
+        L --> M[Enregistrement des résultats]
+        M --> N[Notification à l'étudiant]
+        N --> O[Fin]
+  `} />
+</div>
+## Diagramme de classes
+
+Le diagramme de classes représente la structure statique du système, montrant les classes, leurs attributs, opérations et les relations entre elles.
+
+<div style={{
+    backgroundColor: '#ffe9a3', // Couleur de fond
+    padding: '20px',            // Espace intérieur
+    borderRadius: '10px',       // Bordures arrondies
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Ombre
+}}>
+    <MermaidDiagram chart={`
+    ---
+    config:
+    theme: base
+    ---
+    classDiagram
+        subgraph Diagramme_UML_CodeGrade
+            class User {
+                id
+                email
+                name
+                profileCompleted
+                emailVerified
+                image
+                background
+                role
+                createdAt
+                updatedAt
+                website
+                preferredLanguage
+                technologies
+                passions
+            }
+            class Exam {
+                id
+                title
+                description
+                filePath
+                format
+                type
+                maxAttempts
+                createdAt
+                updatedAt
+                startDate
+                endDate
+                status
+            }
+            class Question {
+                id
+                text
+                maxPoints
+                choices
+                programmingLanguage
+                answer
+            }
+            class Answer {
+                id
+                filePath
+                attemptNumber
+                createdAt
+                updatedAt
+                status
+            }
+            class QuestionAnswer {
+                id
+                content
+                createdAt
+                updatedAt
+            }
+            class Correction {
+                id
+                aiFeedback
+                autoScore
+                manualScore
+                improvement
+                createdAt
+            }
+            class Grade {
+                id
+                finalScore
+                isRevised
+                comments
+            }
+            class ExamParticipant {
+                id
+                status
+                joinedAt
+            }
+            User "1" -- "0..*" Exam : crée
+            User "1" -- "0..*" Answer : soumet
+            User "1" -- "0..*" Grade : reçoit
+            User "1" -- "0..*" Correction : corrige
+            User "1" -- "0..*" ExamParticipant : participe
+            Exam "1" -- "0..*" Question : contient
+            Exam "1" -- "0..*" Answer : reçoit
+            Exam "1" -- "0..*" Grade : génère
+            Exam "1" -- "0..*" ExamParticipant : invite
+            Question "1" -- "0..*" QuestionAnswer : obtient
+            Answer "1" -- "0..*" QuestionAnswer : contient
+            Answer "1" -- "0..*" Correction : reçoit
+            Answer "1" -- "1" Grade : génère
+            Correction "1" -- "0..*" Grade : détermine
+        end
+  `} />
+</div>
+
+## Diagramme de cas d'utilisation
+
+Le diagramme de cas d'utilisation illustre les interactions entre les acteurs et le système, montrant les principales fonctionnalités disponibles.
+
+<div style={{
+    backgroundColor: '#ffe9a3',
+    padding: '20px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+}}>
+
+    <img src="/assets/uml-use-case.png" alt="Diagramme de cas d'utilisation" className="w-50" />
+</div>
+
+## Diagramme de séquence
+
+Le diagramme de séquence ci-dessous montre le flux d'évaluation d'une soumission de code.
+
+<div style={{
+    backgroundColor: '#ffe9a3',
+    padding: '20px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+}}>
+    <MermaidDiagram chart={`
+    sequenceDiagram
+        actor Student
+        participant Frontend
+        participant Serveur Actions
+        participant AIService
+        participant Database
+
+            Student->>Frontend: Soumet un code
+            Frontend->>Serveur Actions: POST /submissions
+            Serveur Actions->>Database: Enregistre la soumission
+            Database-->>Serveur Actions: Confirmation
+            Serveur Actions->>AIService: Demande d'évaluation
+            AIService->>AIService: Analyse du code
+            AIService->>Serveur Actions: Résultats d'évaluation
+            Serveur Actions->>Database: Enregistre l'évaluation
+            Database-->>Serveur Actions: Confirmation
+            Serveur Actions-->>Frontend: Retourne les résultats
+            Frontend-->>Student: Affiche le feedback
+`} />
+</div>
+
+## Diagramme d'activités
+
+Le diagramme d'activités suivant illustre le processus d'évaluation d'une soumission.
+
+<div style={{
+    backgroundColor: '#ffe9a3',
+    padding: '20px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+}}>
+    <img src="/assets/uml-activity.png" alt="Diagramme de cas d'utilisation" className="w-50" />
+</div>
+
+## Diagramme de déploiement
+
+Le diagramme de déploiement montre l'architecture physique du système et la distribution des composants.
+
+<div style={{
+    backgroundColor: '#ffe9a3',
+    padding: '20px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+}}>
+    <img src="/assets/uml-deploy.png" alt="Diagramme de cas d'utilisation" className="w-50" />
+</div>
+
+## Diagramme de packages
+
+Le diagramme de packages illustre la structure modulaire de l'application et les dépendances entre les différents composants.
+
+<div style={{
+    backgroundColor: '#ffe9a3',
+    padding: '20px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+}}>
+    <img src="/assets/uml-package.png" alt="Diagramme de cas d'utilisation" className="w-50" />
+</div>
+
+Ces diagrammes UML fournissent une vue d'ensemble de l'architecture de notre système d'évaluation de code par IA. Ils servent de base à la conception et au développement de l'application, assurant une compréhension commune entre les membres de l'équipe et facilitant la maintenance future.

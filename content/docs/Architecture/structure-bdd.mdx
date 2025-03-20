@@ -1,0 +1,473 @@
+---
+title: Structure base de donnée
+description: Diagrammes UML détaillant la structure et les interactions du système d'évaluation
+---
+
+import MermaidDiagram from "../../../components/MermaidDiagram";
+
+Notre plateforme d'évaluation automatisée s'appuie sur une base de données PostgreSQL soigneusement conçue pour gérer efficacement les examens, les étudiants, les soumissions et les évaluations. Cette section présente l'architecture de notre schéma de base de données, défini via Prisma.
+
+## Schéma Prisma
+
+Notre schéma de base de données est défini de manière déclarative avec Prisma, ce qui nous permet de maintenir une structure cohérente et type-safe. Voici nos modèles de données principaux:
+
+### Configuration Prisma
+
+```prisma
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+```
+
+### Enums
+
+```prisma
+enum Role {
+  TEACHER
+  STUDENT
+  SUPERADMIN
+}
+
+enum ExamType {
+  DOCUMENT
+  QCM
+  CODE
+}
+
+enum ExamStatus {
+  PENDING // En attente de la date de début
+  ACTIVE // En cours
+  COMPLETED // Terminé (date de fin dépassée)
+}
+
+enum SubmissionStatus {
+  PENDING // En attente de correction
+  CORRECTED // Corrigé
+  REVISED // Révisé après correction
+}
+
+enum ParticipantStatus {
+  PENDING // En attente de réponse
+  ACCEPTED // A accepté l'invitation
+  DECLINED // A refusé l'invitation
+  COMPLETED // A terminé l'examen
+}
+```
+
+### Modèle User
+
+```prisma
+model User {
+  id                 String            @id
+  email              String            @unique
+  name               String?
+  profileCompleted   Boolean           @default(false)
+  emailVerified      Boolean
+  image              String?
+  background         String?
+  role               Role              @default(STUDENT)
+  createdAt          DateTime
+  updatedAt          DateTime
+  website            String?
+  preferredLanguage  String?
+  technologies       String[]
+  passions           String[]
+  sessions           Session[]
+  accounts           Account[]
+  exams              Exam[]            @relation("ExamsCreated")
+  answers            Answer[]
+  grades             Grade[]
+  Correction         Correction[]
+  participatingExams ExamParticipant[]
+
+  @@map("user")
+}
+```
+
+Le modèle `User` représente tous les utilisateurs du système. Il stocke les informations de profil, les préférences, et définit les relations avec les autres entités comme les examens, les réponses et les corrections. Chaque utilisateur peut avoir l'un des trois rôles : TEACHER, STUDENT ou SUPERADMIN.
+
+### Modèles d'authentification et de session
+
+```prisma
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+```
+
+Ces modèles gèrent l'authentification, les sessions utilisateur et la vérification d'identité. Ils permettent la connexion via différents fournisseurs d'authentification et assurent la sécurité des sessions utilisateur.
+
+### Modèle Exam
+
+```prisma
+model Exam {
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  filePath    String?
+  format      String?
+  type        ExamType
+  maxAttempts Int        @default(1)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  startDate   DateTime?
+  endDate     DateTime?
+  status      ExamStatus @default(PENDING)
+
+  questions    Question[]        @relation("ExamQuestions")
+  createdBy    User              @relation("ExamsCreated", fields: [createdById], references: [id])
+  createdById  String
+  answers      Answer[]          @relation("ExamAnswers")
+  grades       Grade[]           @relation("ExamGrades")
+  participants ExamParticipant[]
+}
+```
+
+Le modèle `Exam` définit les examens créés par les enseignants. Il inclut des informations sur le type d'examen (DOCUMENT, QCM, CODE), les dates de début et de fin, ainsi que l'état actuel de l'examen. Chaque examen peut contenir plusieurs questions et est lié à plusieurs participants.
+
+### Modèle Question
+
+```prisma
+model Question {
+  id                  String           @id @default(uuid())
+  text                String
+  maxPoints           Float
+  choices             String[] // Pour les QCM : tableau des choix possibles
+  programmingLanguage String? // Pour les questions de Code : langage à utiliser
+  answer              String?          @db.VarChar(5000)
+  exam                Exam             @relation("ExamQuestions", fields: [examId], references: [id], onDelete: Cascade)
+  examId              String
+  answers             QuestionAnswer[]
+
+  @@index([examId])
+}
+```
+
+Le modèle `Question` représente les questions individuelles dans un examen. Il supporte différents types de questions :
+- Questions à choix multiples (via le champ `choices`)
+- Questions de programmation (avec spécification du langage)
+- Questions textuelles
+Chaque question est associée à un examen spécifique et peut recevoir plusieurs réponses des étudiants.
+
+### Modèles de réponse
+
+```prisma
+model Answer {
+  id            String           @id @default(uuid())
+  filePath      String
+  attemptNumber Int              @default(1)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  status        SubmissionStatus @default(PENDING)
+
+  // Relations existantes
+  student   User   @relation(fields: [studentId], references: [id])
+  studentId String
+  exam      Exam   @relation("ExamAnswers", fields: [examId], references: [id], onDelete: Cascade)
+  examId    String
+
+  // Nouvelle relation pour les réponses aux questions
+  questionAnswers QuestionAnswer[]
+
+  corrections Correction[] @relation("AnswerCorrections")
+  grade       Grade?
+
+  @@unique([studentId, examId, attemptNumber])
+}
+
+// Nouveau modèle pour stocker les réponses aux questions
+model QuestionAnswer {
+  id        String   @id @default(uuid())
+  content   String   @db.VarChar(5000)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  answer     Answer   @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  answerId   String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String
+
+  @@unique([answerId, questionId])
+}
+```
+
+Ces modèles gèrent les réponses des étudiants aux examens :
+- `Answer` représente la soumission globale d'un étudiant pour un examen
+- `QuestionAnswer` stocke les réponses spécifiques pour chaque question de l'examen
+
+
+### Modèles d'évaluation
+
+```prisma
+model Correction {
+  id            String   @id @default(uuid())
+  aiFeedback    String
+  autoScore     Float
+  manualScore   Float?
+  improvement   String?
+  correctedBy   User?    @relation(fields: [correctedById], references: [id])
+  correctedById String?
+  createdAt     DateTime @default(now())
+
+  answer   Answer  @relation("AnswerCorrections", fields: [answerId], references: [id], onDelete: Cascade)
+  answerId String
+  grades   Grade[]
+}
+
+model Grade {
+  id         String  @id @default(uuid())
+  finalScore Float
+  isRevised  Boolean @default(false)
+  comments   String?
+
+  student      User       @relation(fields: [studentId], references: [id])
+  studentId    String
+  exam         Exam       @relation("ExamGrades", fields: [examId], references: [id], onDelete: Cascade)
+  examId       String
+  correction   Correction @relation(fields: [correctionId], references: [id], onDelete: Cascade)
+  correctionId String
+  answer       Answer     @relation(fields: [answerId], references: [id])
+  answerId     String     @unique // Ajout de @unique pour éviter les doublons
+
+  @@unique([studentId, examId])
+}
+```
+
+Ces modèles gèrent le processus d'évaluation :
+- `Correction` stocke à la fois les résultats de l'évaluation automatique par IA (`aiFeedback`, `autoScore`) et les ajustements manuels des enseignants (`manualScore`, `improvement`)
+- `Grade` représente la note finale attribuée à un étudiant pour un examen spécifique
+
+Cette structure permet un processus d'évaluation en deux étapes, combinant l'automatisation par IA et la révision humaine.
+
+### Modèle de participation aux examens
+
+```prisma
+model ExamParticipant {
+  id       String            @id @default(uuid())
+  examId   String
+  userId   String
+  status   ParticipantStatus @default(PENDING)
+  joinedAt DateTime          @default(now())
+  exam     Exam              @relation(fields: [examId], references: [id], onDelete: Cascade)
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([examId, userId])
+}
+```
+
+Le modèle `ExamParticipant` gère la relation entre les utilisateurs et les examens. Il permet de suivre le statut de participation de chaque étudiant (en attente, accepté, refusé, terminé) et assure qu'un utilisateur ne peut être invité qu'une seule fois à un examen spécifique.
+
+## Diagramme Entité-Relation
+
+Le diagramme suivant illustre les relations entre les principales entités de notre base de données:
+
+<div style={{
+    backgroundColor: '#ffe9a3', // Couleur de fond
+    padding: '20px',            // Espace intérieur
+    borderRadius: '10px',       // Bordures arrondies
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Ombre
+}}>
+    <MermaidDiagram chart={`
+erDiagram
+    User ||--o{ Session : "possède"
+    User ||--o{ Account : "possède"
+    User ||--o{ Exam : "crée"
+    User ||--o{ Answer : "soumet"
+    User ||--o{ Grade : "reçoit"
+    User ||--o{ Correction : "effectue"
+    User ||--o{ ExamParticipant : "participe"
+
+        Exam ||--o{ Question : "contient"
+        Exam ||--o{ Answer : "reçoit"
+        Exam ||--o{ Grade : "génère"
+        Exam ||--o{ ExamParticipant : "inclut"
+
+        Question ||--o{ QuestionAnswer : "reçoit"
+
+        Answer ||--o{ QuestionAnswer : "contient"
+        Answer ||--o{ Correction : "reçoit"
+        Answer ||--|| Grade : "génère"
+
+        Correction ||--o{ Grade : "détermine"
+
+        User {
+            string id
+            string email
+            string name
+            boolean emailVerified
+            Role role
+        }
+
+        Session {
+            string id
+            DateTime expiresAt
+            string token
+        }
+
+        Account {
+            string id
+            string providerId
+            string password
+        }
+
+        Verification {
+            string id
+            string identifier
+            DateTime expiresAt
+        }
+
+        Exam {
+            string id
+            string title
+            ExamType type
+            int maxAttempts
+            ExamStatus status
+        }
+
+        Question {
+            string id
+            string text
+            float maxPoints
+            string[] choices
+        }
+
+        Answer {
+            string id
+            string filePath
+            int attemptNumber
+            SubmissionStatus status
+        }
+
+        QuestionAnswer {
+            string id
+            string content
+        }
+
+        Correction {
+            string id
+            string aiFeedback
+            float autoScore
+            float manualScore
+        }
+
+        Grade {
+            string id
+            float finalScore
+            boolean isRevised
+        }
+
+        ExamParticipant {
+            string id
+            ParticipantStatus status
+            DateTime joinedAt
+        }
+`}/>
+</div>
+
+## Architecture des Données
+
+Notre schéma de base de données a été conçu avec les principes suivants:
+
+### Modèle de Sécurité et d'Accès
+- **Système de rôles hiérarchiques**: SUPERADMIN > TEACHER > STUDENT
+- **Gestion des participations**: Contrôle précis des accès aux examens via le modèle ExamParticipant
+- **Authentification robuste**: Prise en charge de multiples méthodes d'authentification et gestion sécurisée des sessions
+
+### Relations Clés
+1. **User-Exam**: Relations multiples en tant que créateur, participant ou évaluateur
+2. **Exam-Question**: Structure hiérarchique pour organiser les questions dans un examen
+3. **Answer-QuestionAnswer**: Séparation entre soumission globale et réponses individuelles
+4. **Correction-Grade**: Processus d'évaluation à deux niveaux (automatique et manuelle)
+
+### Flexibilité des Types d'Évaluation
+- **Types d'examens variés**: Support pour examens documentaires, QCM et exercices de code
+- **Évaluation hybride**: Combinaison d'évaluation automatisée par IA et de corrections manuelles
+- **Mécanisme de révision**: Possibilité de réviser et d'améliorer les soumissions déjà corrigées
+
+### Traçabilité et Historique
+- **Versions multiples**: Suivi des différentes tentatives pour un même examen
+- **Horodatage complet**: Enregistrement des dates de création, de mise à jour et de participation
+- **Statuts explicites**: Suivi précis de l'état de chaque entité dans le système
+
+## Migration et Évolution du Schéma
+
+Notre utilisation de Prisma facilite la gestion des migrations de schéma:
+
+```bash
+# Générer une migration après modification du schéma
+npx prisma migrate dev --name nom_de_la_migration
+
+# Appliquer les migrations en production
+npx prisma migrate deploy
+
+# Visualiser le schéma actuel
+npx prisma studio
+```
+
+## Optimisations et Indexation
+
+Notre schéma inclut des optimisations pour les requêtes fréquentes:
+
+- **Clés composites** sur les relations utilisateur-examen pour éviter les doublons
+- **Indexation des clés étrangères** pour améliorer les performances des jointures
+- **Relations en cascade** pour maintenir l'intégrité référentielle lors des suppressions
+- **Contraintes d'unicité** pour éviter les soumissions ou participations dupliquées
+
+## Considérations de Mise à l'Échelle
+
+Cette structure de base de données a été conçue pour:
+
+- **Haute performance**: Modèles optimisés pour minimiser les requêtes complexes
+- **Évolutivité horizontale**: Compatible avec le scaling de Neon PostgreSQL
+- **Support analytique**: Structure permettant l'extraction efficace de données pour les tableaux de bord
+- **Flexibilité d'extension**: Facilité d'ajout de nouveaux types d'examens ou méthodes d'évaluation
+
+Cette architecture de base de données assure le bon fonctionnement de notre plateforme d'évaluation automatisée tout en permettant une évolutivité future et une maintenance simplifiée.
