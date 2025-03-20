@@ -23,8 +23,8 @@ export default function Layout({ children }: { children: ReactNode }) {
                 property="og:description"
                 content="Documentation complète pour la plateforme CodeGrade. Découvrez comment utiliser notre système d'évaluation intelligente."
             />
-            <meta property="og:image" content="https://www.votredomaine.com/landing-docs.png" />
-            <meta property="og:url" content="https://www.votredomaine.com" />
+            <meta property="og:image" content="https://https://code-grade-docs-eight.vercel.app/landing-docs.png" />
+            <meta property="og:url" content="https://https://code-grade-docs-eight.vercel.app/" />
             <meta property="og:type" content="website" />
 
             {/* Twitter Card Meta Tags (optionnel) */}
@@ -34,7 +34,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 name="twitter:description"
                 content="Documentation complète pour la plateforme CodeGrade. Découvrez comment utiliser notre système d'évaluation intelligente."
             />
-            <meta name="twitter:image" content="https://www.votredomaine.com/landing-docs.png" />
+            <meta name="twitter:image" content="https://https://code-grade-docs-eight.vercel.app/landing-docs.png" />
         </head>
         <body className="dark-mode">
         <RootProvider>{children}</RootProvider>
