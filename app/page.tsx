@@ -86,7 +86,7 @@ export default function HomePage() {
                             CodeGrade Docs
                         </span>
                     </div>
-                    <nav className="flex space-x-8">
+                    <nav className="hidden  md:flex space-x-8">
                         <Link href="/docs" className="text-sm font-medium text-gray-300 transition-colors hover:text-emerald-400">
                             Documentation
                         </Link>
@@ -274,7 +274,7 @@ export default function HomePage() {
                     </div>
 
                     {/* Docs preview */}
-                    <div className="relative mx-auto mt-16 h-[500px] w-full max-w-5xl overflow-hidden rounded-xl border border-gray-800 bg-gray-900/30 shadow-2xl backdrop-blur-sm">
+                    <div className=" hidden md:block relative mx-auto mt-16 h-[500px] w-full max-w-5xl overflow-hidden rounded-xl border border-gray-800 bg-gray-900/30 shadow-2xl backdrop-blur-sm">
                         <div className="absolute -top-20 -left-20 h-40 w-40 rounded-full bg-emerald-500/20 blur-3xl"></div>
                         <div className="absolute -bottom-20 -right-20 h-40 w-40 rounded-full bg-emerald-500/20 blur-3xl"></div>
 
